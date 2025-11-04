@@ -2,7 +2,7 @@ name: quetz
 channels:
   - https://repo.mamba.pm/conda-forge
 dependencies:
-  - python>=3.7
+  - python>=3.7,<3.12.0a0
   - pip
   - fastapi
   - typer >=0.9,<1.0
@@ -52,5 +52,4 @@ dependencies:
   - pytest-asyncio
   - pytest-timeout
   - pydantic >=2
-  - pip:
-      - git+https://github.com/jupyter-server/jupyter_releaser.git@v2
+  - jupyter-releaser
