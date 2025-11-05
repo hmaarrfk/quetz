@@ -1,5 +1,47 @@
 ![quetz header image](docs/assets/quetz_header.png)
 
+## Creating a conda-forge mirror
+My personal notes on creating a conda-forge proxy
+
+```
+git clone https://github.com/mamba-org/quetz.git
+
+cd quetz
+mamba env create -f environment.yml
+conda activate quetz
+ln -s "${CONDA_PREFIX}" .venv  # Necessary for pyright.
+
+export QUETZ_PORT=8624
+quetz run test_quetz --copy-conf ./dev_config.toml --dev --reload --port ${QUETZ_PORT}
+
+```
+* Go to link: http://localhost:8624/api/dummylogin/alice
+* Get your API key
+* Set it as your environment variable
+
+```
+export QUETZ_API_KEY=...
+export QUETZ_SERVER_URL=http://localhost:${QUETZ_PORT}
+```
+
+* Use the API key to create the channel-proxy -- channel
+```
+curl -X POST "http://${QUETZ_SERVER_URL}/api/channels" \
+    -H  "accept: application/json" \
+    -H  "Content-Type: application/json" \
+    -H  "X-API-Key: ${QUETZ_API_KEY}" \
+    -d '{"name":"conda-forge",
+         "private":false,
+         "mirror_channel_url":"https://conda.anaconda.org/conda-forge",
+         "mirror_mode":"proxy"}'
+```
+
+To start the server after it stops:
+
+```
+quetz start conda-forge-proxy --reload --port ${QUETZ_PORT:-8624} --host 0.0.0.0
+```
+
 ## The Open-Source Server for Conda Packages
 
 <table>
@@ -300,9 +342,9 @@ curl -X POST "http://localhost:8000/api/channels" \
     -H  "accept: application/json" \
     -H  "Content-Type: application/json" \
     -H  "X-API-Key: ${QUETZ_API_KEY}" \
-    -d '{"name":"proxy-channel",
+    -d '{"name":"conda-forge",
          "private":false,
-         "mirror_channel_url":"https://conda.anaconda.org/btel",
+         "mirror_channel_url":"https://conda.anaconda.org/conda-forge",
          "mirror_mode":"proxy"}'
 ```
 
